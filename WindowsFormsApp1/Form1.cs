@@ -51,6 +51,8 @@ namespace WindowsFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
+            //For now it will run this in once. 
+            //We want this to run for all ips that are present in the list , one by one. 
             Task.Run(() => uploadFile());
 
 
@@ -59,7 +61,7 @@ namespace WindowsFormsApp1
         private void uploadFile()
         {
                       
-            // ########### REmove later  . Did this for testing.
+            // ########### REmove later  . Did this for testing. otherwise use will select update file and select update list from GUI
            // label5.Text = "192.168.1.100";
             updateFile = "C:\\Users\\waath1\\Desktop\\sitelogic-0.8.10.plc";
             uploadFilePath = new System.IO.FileStream(updateFile, System.IO.FileMode.Open);
@@ -80,6 +82,7 @@ namespace WindowsFormsApp1
                 device1.uploadFile(updateFile, UploadProgress);
 
                 device1.ftpDisconnect();
+                //updatetext("File Uploaded\n");
 
                 //Run a state machine here. 
                 // We will do steps like 
@@ -87,13 +90,9 @@ namespace WindowsFormsApp1
                 //device1.copyFiletoDirectory();
                 //device1.setRunPermissions();
                 //device1.runInstaller();
+                // Verify some new functionaliy on device before declaring it that update is finished 
                 //device1.verifyInstall();
                 //device1.checkVersion();
-       
-                //updatetext("File Uploaded\n");
-                    
-              
-                //runInstaller();
 
             }
             catch (Exception er)
@@ -107,7 +106,7 @@ namespace WindowsFormsApp1
             progressBar1.Invoke((MethodInvoker)delegate { progressBar1.Value = (int)uploaded; });
         }
 
-    private void label1_Click(object sender, EventArgs e)
+         private void label1_Click(object sender, EventArgs e)
         {
 
         }
@@ -131,41 +130,6 @@ namespace WindowsFormsApp1
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             label5.Text = listBox1.SelectedItem.ToString();
-        }
-
-        // Not used anymore
-        private void runInstaller()
-        {
-            try
-            {
-
-                ssh.Connect();
-
-               updatetext("Connected to SSH\n");
-
-                if (ssh.IsConnected)
-                {
-                    string command;
-                    string fileName = Path.GetFileName(updateFile);
-                    updatetext(RunCommand(ssh, "sudo mkdir -p /tmp/bulkUpdater"));
-                    updatetext(RunCommand(ssh, "sudo mv /tmp/" + fileName + " /tmp/bulkUpdater/"));
-                    //command = "cd /tmp/bulkUpdater; sudo chmod +x " + fileName + " ; sudo ./" + fileName + " extract >> $(date +Log_%d_%m_%y_%H_%M_%S)";
-                    command = "cd /tmp/bulkUpdater; sudo chmod +x " + fileName + " ; sudo ./" + fileName + " extract ";
-                    updatetext(command + "\n");
-                    updatetext(RunCommand(ssh, command) + "\n");
-
-                    // Verify installed software
-                    ssh.Disconnect();
-                    progressBar1.Value += 30;
-                }
-
-            }
-            catch (Exception er)
-            {
-                updatetext(er.ToString());
-            }
-
-
         }
 
         public delegate void invoke(string text);
